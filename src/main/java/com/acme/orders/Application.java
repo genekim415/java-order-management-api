@@ -1,9 +1,7 @@
-package com.example.app;
+package com.acme.orders;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class Application {
@@ -12,10 +10,10 @@ public class Application {
     }
 }
 
-@RestController
-class HelloController {
-    @GetMapping("/api/hello")
-    public String hello() {
-        return "hello";
-    }
-}
+// @RestController
+// class HelloController {
+//     @GetMapping("/api/hello")
+//     public String hello() {
+//         return "hello";
+//     }
+// }

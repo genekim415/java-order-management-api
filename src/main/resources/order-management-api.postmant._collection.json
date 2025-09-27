@@ -1,0 +1,247 @@
+{
+  "info": {
+    "_postman_id": "3e1c4e9d-b6d3-4c54-9a5b-f4d7afb9bf1e",
+    "name": "Order Management API",
+    "description": "Collection for testing the Order Management Spring Boot application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Orders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Retrieves all orders from the database"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Order by ID (Valid)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/orders/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders", "1"]
+        },
+        "description": "Retrieves a specific order by ID (existing ID)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Order by ID (Not Found)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/orders/999",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders", "999"]
+        },
+        "description": "Attempts to retrieve an order with a non-existent ID (should return 404)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Order by ID (Invalid ID)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/orders/abc",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders", "abc"]
+        },
+        "description": "Attempts to retrieve an order with an invalid ID format (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Valid)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"Test Product\",\n    \"quantity\": 5,\n    \"unitPrice\": 29.99\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Creates a valid new order"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Missing Product Name)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"\",\n    \"quantity\": 5,\n    \"unitPrice\": 29.99\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Attempts to create an order with an empty product name (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Invalid Quantity)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"Test Product\",\n    \"quantity\": 0,\n    \"unitPrice\": 29.99\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Attempts to create an order with a quantity less than 1 (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Negative Unit Price)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"Test Product\",\n    \"quantity\": 5,\n    \"unitPrice\": -10.99\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Attempts to create an order with a negative unit price (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Multiple Validation Errors)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"\",\n    \"quantity\": 0,\n    \"unitPrice\": -10.99\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Attempts to create an order with multiple validation errors (should return 400 with multiple errors)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Order (Malformed JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"productName\": \"Test Product\",\n    \"quantity\": 5,\n    \"unitPrice\": 29.99,\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "orders"]
+        },
+        "description": "Attempts to create an order with malformed JSON (should return 400)"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
