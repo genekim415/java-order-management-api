@@ -1,14 +1,14 @@
 package com.acme.orders.service;
 
 import com.acme.orders.entity.Order;
+import com.acme.orders.error.ResourceNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderService {
     List<Order> getAllOrders();
 
-    Optional<Order> getOrderById(Long id);
+    Order getOrderById(Long id) throws ResourceNotFoundException;
 
     Order createOrder(Order order);
 }

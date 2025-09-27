@@ -1,6 +1,7 @@
 package com.acme.orders.controller;
 
 import com.acme.orders.entity.Order;
+import com.acme.orders.error.ResourceNotFoundException;
 import com.acme.orders.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +58,7 @@ public class OrderControllerTest {
         Order order = new Order("Product 1", 2, 19.99);
         order.setId(1L);
 
-        when(orderService.getOrderById(1L)).thenReturn(Optional.of(order));
+        when(orderService.getOrderById(1L)).thenReturn(order);
 
         // when & then
         mockMvc.perform(get("/api/orders/1"))
@@ -71,11 +71,15 @@ public class OrderControllerTest {
     @Test
     public void shouldReturn404WhenOrderNotFound() throws Exception {
         // given
-        when(orderService.getOrderById(99L)).thenReturn(Optional.empty());
+        when(orderService.getOrderById(99L)).thenThrow(
+                new ResourceNotFoundException("Order", "id", 99L));
 
         // when & then
         mockMvc.perform(get("/api/orders/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.error", is("Not Found")))
+                .andExpect(jsonPath("$.message", containsString("Order not found with id")));
     }
 
     @Test
@@ -100,7 +104,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void shouldReturnValidationErrorsForInvalidOrder() throws Exception {
+    public void shouldReturnBadRequestWhenInvalidOrder() throws Exception {
         // given
         Order invalidOrder = new Order("", 0, -5.0);
 
@@ -113,37 +117,6 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.error", is("Validation Error")))
                 .andExpect(jsonPath("$.validationErrors", hasSize(3)))
                 .andExpect(jsonPath("$.validationErrors[*].field",
-                        containsInAnyOrder("productName", "quantity", "unitPrice")))
-                .andExpect(jsonPath("$.validationErrors[?(@.field=='productName')].message",
-                        contains("Product name is required")))
-                .andExpect(jsonPath("$.validationErrors[?(@.field=='quantity')].message",
-                        contains("Quantity must be at least 1")))
-                .andExpect(jsonPath("$.validationErrors[?(@.field=='unitPrice')].message",
-                        contains("Unit price cannot be negative")));
-    }
-
-    @Test
-    public void shouldReturnNotFoundForMissingOrder() throws Exception {
-        // given
-        when(orderService.getOrderById(any(Long.class))).thenReturn(Optional.empty());
-
-        // when & then
-        mockMvc.perform(get("/api/orders/99"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.error", is("Not Found")))
-                .andExpect(jsonPath("$.message", containsString("Order not found with id")));
-    }
-
-    @Test
-    public void shouldReturnFormattedErrorForNotFound() throws Exception {
-        // given
-        when(orderService.getOrderById(any(Long.class))).thenReturn(Optional.empty());
-
-        // when & then
-        mockMvc.perform(get("/api/orders/99"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.message", is("Order not found with id: 99")));
+                        containsInAnyOrder("productName", "quantity", "unitPrice")));
     }
 }

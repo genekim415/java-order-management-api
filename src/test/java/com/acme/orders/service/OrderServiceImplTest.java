@@ -1,6 +1,7 @@
 package com.acme.orders.service;
 
 import com.acme.orders.entity.Order;
+import com.acme.orders.error.ResourceNotFoundException;
 import com.acme.orders.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
@@ -42,37 +44,42 @@ public class OrderServiceImplTest {
         List<Order> expectedOrders = Arrays.asList(testOrder, order2);
         when(orderRepository.findAll()).thenReturn(expectedOrders);
 
+        // when
         List<Order> actualOrders = orderService.getAllOrders();
 
+        // then
         assertThat(actualOrders).isEqualTo(expectedOrders);
         assertThat(actualOrders).hasSize(2);
     }
 
     @Test
     public void shouldReturnOrderById() {
-
+        // given
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
-        Optional<Order> foundOrder = orderService.getOrderById(1L);
+        // when
+        Order foundOrder = orderService.getOrderById(1L);
 
-        assertThat(foundOrder).isPresent();
-        assertThat(foundOrder.get().getId()).isEqualTo(1L);
-        assertThat(foundOrder.get().getProductName()).isEqualTo("Test Product");
+        // then
+        assertThat(foundOrder).isNotNull();
+        assertThat(foundOrder.getId()).isEqualTo(1L);
+        assertThat(foundOrder.getProductName()).isEqualTo("Test Product");
     }
 
     @Test
-    public void shouldReturnEmptyWhenOrderNotFound() {
-
+    public void shouldThrowExceptionWhenOrderNotFound() {
+        // given
         when(orderRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Optional<Order> foundOrder = orderService.getOrderById(99L);
-
-        assertThat(foundOrder).isEmpty();
+        // when & then
+        assertThrows(ResourceNotFoundException.class, () -> {
+            orderService.getOrderById(99L);
+        });
     }
 
     @Test
     public void shouldCreateOrder() {
-
+        // given
         Order orderToCreate = new Order("New Product", 3, 9.99);
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order savedOrder = invocation.getArgument(0);
@@ -80,8 +87,10 @@ public class OrderServiceImplTest {
             return savedOrder;
         });
 
+        // when
         Order createdOrder = orderService.createOrder(orderToCreate);
 
+        // then
         assertThat(createdOrder.getId()).isEqualTo(10L);
         assertThat(createdOrder.getProductName()).isEqualTo("New Product");
         assertThat(createdOrder.getQuantity()).isEqualTo(3);

@@ -3,6 +3,8 @@ package com.acme.orders.controller;
 import com.acme.orders.entity.Order;
 import com.acme.orders.service.OrderService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -26,10 +29,9 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id) {
-        return orderService.getOrderById(id)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found with id: " + id));
+    public Order getOrderById(@PathVariable("id") Long id) {
+        logger.info("GET request received for order with id: {}", id);
+        return orderService.getOrderById(id);
     }
 
     @PostMapping
