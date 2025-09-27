@@ -9,11 +9,3 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
-
-// @RestController
-// class HelloController {
-//     @GetMapping("/api/hello")
-//     public String hello() {
-//         return "hello";
-//     }
-// }
